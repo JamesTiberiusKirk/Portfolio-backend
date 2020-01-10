@@ -1,35 +1,35 @@
-//var url = "mongodb://localhost:27017";
-const {MongoClient} = require('mongodb');
+//import MongoClient from 'mongodb';
+const MongoClient = require('mongodb').MongoClient;
 
+class Db {
 
-async function main(){
-    //const uri = 'mongodb+srv://root:example@localhost:27017/test?retryWrites=true&w=majority';
-    const uri = 'mongodb://root:example@localhost:27017';
-
-    const client = new MongoClient(uri);
-
-    try {
-        // Connect to the MongoDB cluster
-        await client.connect();
- 
-        // Make the appropriate DB calls
-        await  listDatabases(client);
- 
-    } catch (e) {
-        console.error(e);
-    } finally {
-        await client.close();
+    constructor(creds, address) {
+        this.uri = `mongodb://${creds}@${address}:27017`;
+        this.dbName = 'portfolio';
+        this.db;
+        this.dbOpts = { 
+            useUnifiedTopology: true,
+            useNewUrlParser: true 
+        }
+        
+        this.init();
     }
+
+    init() {
+        MongoClient.connect(this.uri, this.dbOpts, (err, client) => {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log('connected');
+                this.db = client.db(this.dbName);
+            }
+        });
+
+    }
+
+    // await getCvByName(id){
+
+    // }
 }
 
-async function listDatabases(client){
-    databasesList = await client.db().admin().listDatabases();
- 
-    console.log("Databases:");
-    databasesList.databases.forEach(db => console.log(` - ${db.name}`));
-};
-
-
-main().catch(console.error);
-
-// listDatabases();
+module.exports = Db;
