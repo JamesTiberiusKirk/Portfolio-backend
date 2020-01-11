@@ -27,9 +27,13 @@ class Db {
 
     }
 
-    // await getCvByName(id){
+    getPrimaryKey(id){
+        return ObjectID(id)
+    }
 
-    // }
+    getDb(){
+        return this.db;
+    }
 }
 
 module.exports = Db;
