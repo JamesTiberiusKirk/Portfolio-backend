@@ -1,20 +1,12 @@
-//import { Db } from './db.js'; 
-//import express from 'express';
-
 const Db = require('./db');
 const express = require('express');
+const cors = require('cors')
 
-var cors = require('cors')
 const app = express();
 const port = 3000;
 
-// cv = {
-//     author: 'Dumitru Vulpe',
-//     lastUpdated: '01/01/2020',
-//     cv_md: '# test \n hello world'
-// };
-
 app.use(cors());
+var db = new Db('root:example','localhost');
 
 app.get('/hello', (req, res, next) => {
     response = {id:1,msg:'Hello World!'}
@@ -22,9 +14,17 @@ app.get('/hello', (req, res, next) => {
 });
 
 app.get('/cv', (req, res, next) => {
-    res.json( cv );
+    db.getDb().collection('cv').find({}).toArray((err,documents)=>{
+        
+        if (err){
+            console.log(err);
+            return;
+        }
+
+        res.json(documents);
+    });
 });
 
-var db = new Db('root:example','localhost');
+
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
