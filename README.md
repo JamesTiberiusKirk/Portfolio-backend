@@ -3,6 +3,7 @@
 - [] Add a sectret file for db password
 - [] Add a config structure
 - [] Add a routes structure
+- [] Add a models structure for the db
 
 # Routes
 - GET Rotues:
@@ -10,7 +11,6 @@
     - [] `/workexp` to get work experiences
     - [] `/projects` to get project entries from github
 - POST Routes:
-    - [] `/cv_update` to edit/update the CV
-    - [] `/workexp_update` to edit/update the work experience
-    - [] `/projects_update` to edit/update the project entried from github
-    
+    - [] `/cv/update` to edit/update the CV
+    - [] `/workexp/update` to edit/update the work experience
+    - [] `/projects/update` to edit/update the project entried from github
