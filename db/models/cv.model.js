@@ -20,8 +20,8 @@ const CvSchema = new mongoose.Schema({
             minlength: 1,
             trim: true
         },
-        laguages: [{
-            laguage: {
+        languages: [{
+            language: {
                 type: String,
                 required: true,
                 minlength: 1,
@@ -89,5 +89,5 @@ const CvSchema = new mongoose.Schema({
     }]
 });
 
-const Cv = mongoose.model('cv', CvSchema);
+const Cv = mongoose.model('cvs', CvSchema);
 module.exports = { Cv };
