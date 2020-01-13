@@ -2,20 +2,19 @@ const mongoose = require('mongoose');
 
 class Db {
 
-    constructor(creds, address) {
-        this.dbName = 'portfolio';
-        this.uri = `mongodb://${creds}@${address}:27017/${this.dbName}`;
+    constructor(creds, address,dbName) {
+        //this.dbName = 'portfolio';
+        this.uri = `mongodb://${creds}@${address}:27017/${dbName}`;
         this.dbOpts = {
             useUnifiedTopology: true,
             useNewUrlParser: true
         }
 
         this.init();
+        this.supressWarnings()
     }
 
     init() {
-
-        //mongoose.Promise = global.Promise;
         mongoose.connect(this.uri, this.dbOpts)
             .then(() => {
                 console.log('DB connected');
@@ -24,12 +23,12 @@ class Db {
                 console.log('Could not connect');
                 console.log(e);
             });
-
-        mongoose.set('useCreateIndex', true);
-        mongoose.set('useFindAndModify', false);
-
     }
 
+    supressWarnings(){
+        mongoose.set('useCreateIndex', true);
+        mongoose.set('useFindAndModify', false);
+    }
 }
 
 module.exports = Db;
