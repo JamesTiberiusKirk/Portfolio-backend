@@ -9,6 +9,11 @@ const config = {
         host: 'localhost',
         port: 27017,
         dbName: 'portfolio'
+    },
+    jwt: {
+        expiresIn: '15m',
+        secret: 'L5Zp3INaAkPTtdLH7RTNwQtoXyfMfoZxNVX6IOgu', //temporary
+        refreshTokenExpiery: '10' //days
     }
 }
 
