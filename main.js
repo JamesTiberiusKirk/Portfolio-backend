@@ -17,7 +17,7 @@ class Server {
     }
 
     initDb() {
-        this.db = new Db('api-backend:test', 'localhost', 'portfolio');
+        this.db = new Db();
     }
 
     initExpressMiddleware() {
