@@ -1,12 +1,11 @@
 const Db = require('./db/db');
 const express = require('express');
-const cors = require('cors');
 const bodyParser = require('body-parser');
+const appConfig = require('./config/config').app;
 
 const app = express();
-const port = 3000;
 
-const { Cv } = require('./db/models/index.models');
+const { Cv, User } = require('./db/models/index.models');
 
 class Server {
     constructor() {
@@ -21,8 +20,59 @@ class Server {
     }
 
     initExpressMiddleware() {
-        app.use(cors());
+        app.use((req, res, next) => {
+            res.header('Access-Control-Allow-Origin', '*');
+            res.header('Access-Control-Allow-Methods', 'GET, POST, HEAD, OPTIONS, PUT, PATCH, DELETE');
+            res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, x-access-token, x-refresh-token, _id');
+            next();
+        });
         app.use(bodyParser.json());
+    }
+
+    verifySession(req, res, next) {
+
+        let refreshToken = req.header('x-refresh-token');
+        let _id = req.header('_id');
+
+
+        User.findByIdAndToken(_id).then((user) => {
+            if (!user) {
+                return Promise.reject({
+                    'error': 'User not found. And make sure that the refresh token and user id are correct.'
+                })
+            }
+
+            req.user_id = user._id;
+            req.userObject = user
+            req.refreshToken = user.refreshToken;
+
+            let isSessionValid = false;
+
+            user.sessions.forEach((session) => {
+                if (session.token === refreshToken) {
+                    if (User.hasRefreshTokenExpired(session.expiresAt) === false) {
+                        isSessionValid = true;
+                    }
+                }
+            });
+
+            if (isSessionValid) {
+                next();
+            } else {
+                return Promise.reject({
+                    'error': 'Access denied. Refresh token expired or invilaid.'
+                })
+            }
+
+        }).catch((e) => {
+            console.log(e)
+            res.status(401).send(e);
+        });
+
+    }
+
+    start() {
+        app.listen(appConfig.port, () => console.log(`Portfolio-backend listening on port ${appConfig.port}!`));
     }
 
     initRoutes() {
@@ -87,10 +137,65 @@ class Server {
                 console.log(`[DELETE] /cv/delete error: ${e.message}`);
             })
         });
-    }
 
-    start() {
-        app.listen(port, () => console.log(`Portfolio-backend listening on port ${port}!`));
+        app.post('/users', (req, res) => {
+            let username = req.body.username;
+            let password = req.body.password;
+
+            let newUser = new User({
+                username,
+                password
+            });
+
+            newUser.save().then(() => {
+                return newUser.createSession();
+            }).then((refreshtoken) => {
+                return newUser.generateAccessAuthToken().then((accessToken) => {
+                    return { accessToken, refreshtoken }
+                });
+            }).then((authToken) => {
+                res
+                    .header('x-refresh-token', authToken.refreshToken)
+                    .header('x-access-token', authToken.accessToken)
+                    .send(newUser);
+                console.log('[POST] SUCCESS /users');
+            }).catch((e) => {
+                res.status(400).send(e.message);
+                console.log(`[POST] /users error: ${e}`);
+            });
+        });
+
+        app.post('/users/login', (req, res) => {
+            let username = req.body.username;
+            let password = req.body.password;
+
+            User.findByCredentials(username, password).then((user) => {
+                return user.createSession().then((refreshtoken) => {
+                    return user.generateAccessAuthToken().then((accessToken) => {
+                        return { accessToken, refreshtoken }
+                    });
+                }).then((authToken) => {
+                    console.log(authToken)
+                    res
+                        .header('x-refresh-token', authToken.refreshtoken)
+                        .header('x-access-token', authToken.accessToken)
+                        .send(user);
+                    console.log(`[POST] SUCCESS /users/login user:${user.username} logged in`);
+
+                });
+
+            }).catch((e) => {
+                res.status(400).send(e);
+            });
+        });
+
+        app.get('/users/me/access-token', this.verifySession, (req, res) => {
+            req.userObject.generateAccessAuthToken().then((accessToken) => {
+                res.header('x-access-token', accessToken).send({ accessToken });
+            }).catch((e) => {
+                res.status(400).send(e);
+            });
+        });
     }
 }
 
