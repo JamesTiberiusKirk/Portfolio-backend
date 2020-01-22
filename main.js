@@ -1,7 +1,9 @@
-const Db = require('./db/db');
 const express = require('express');
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken'); 
+
 const appConfig = require('./config/config').app;
+const Db = require('./db/db');
 
 const app = express();
 
@@ -24,6 +26,8 @@ class Server {
             res.header('Access-Control-Allow-Origin', '*');
             res.header('Access-Control-Allow-Methods', 'GET, POST, HEAD, OPTIONS, PUT, PATCH, DELETE');
             res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, x-access-token, x-refresh-token, _id');
+            res.header('Access-Control-Expose-Headers', 'x-access-token, x-refresh-token');
+
             next();
         });
         app.use(bodyParser.json());
@@ -69,6 +73,21 @@ class Server {
             res.status(401).send(e);
         });
 
+    }
+
+    authenticate(req, res, next) {
+        let token = req.header('x-access-token');
+
+        jwt.verify(token, User.getJWTSecret(), (err, decoded) => {
+            if (err){
+                console.log(err);
+                return res.status(401).send(err);
+            }
+
+            req.user_id = decoded._id;
+            next();
+
+        });
     }
 
     start() {
@@ -138,7 +157,7 @@ class Server {
             })
         });
 
-        app.post('/users', (req, res) => {
+        app.post('/users/add', this.authenticate, (req, res) => {
             let username = req.body.username;
             let password = req.body.password;
 
