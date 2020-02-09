@@ -9,23 +9,24 @@ class Db {
             useUnifiedTopology: true,
             useNewUrlParser: true
         }
-
-        this.init();
-        this.supressWarnings()
     }
 
     init() {
-        mongoose.connect(this.uri, this.dbOpts)
-            .then(() => {
-                console.log('DB connected');
-            })
-            .catch((e) => {
-                console.log('Could not connect');
-                console.log(e);
+        return new Promise((resolve, reject) => {
+            this.supressWarnings();
+            mongoose.connect(this.uri, this.dbOpts)
+                .then(() => {
+                    console.log('DB connected');
+                    resolve();
+                })
+                .catch((e) => {
+                    console.log('Could not connect');
+                    reject(e);
+                });
             });
     }
 
-    supressWarnings(){
+    supressWarnings() {
         mongoose.set('useCreateIndex', true);
         mongoose.set('useFindAndModify', false);
     }
