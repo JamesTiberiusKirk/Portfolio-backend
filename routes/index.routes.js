@@ -3,20 +3,23 @@ const bodyParser = require('body-parser');
 
 const UserRoute = require('./users.routes');
 const CvRoute = require('./cv.routes');
+const AdminRoutes = require('./admin.routes');
+
+const { login, authenticate } = require('../lib/auth');
 
 class IndexRoutes {
-    constructor(db){
+    constructor(db) {
         this.setDb(db);
         this.initRouter();
         this.initExpressMiddleware();
         this.initRoutes();
     }
 
-    setDb(db){
+    setDb(db) {
         this.db = db;
     }
 
-    initRouter(){
+    initRouter() {
         this.router = express.Router();
     }
 
@@ -32,12 +35,16 @@ class IndexRoutes {
         this.router.use(bodyParser.json());
     }
 
-    initRoutes(){
+    initRoutes() {
         let userRoute = new UserRoute(this.db);
         let cvRoute = new CvRoute(this.db);
+        let adminRoute = new AdminRoutes(this.db);
 
-        this.router.use('/cv',cvRoute.router);
-        this.router.use('/users',userRoute.router);
+        this.router.use('/cv', cvRoute.router);
+        this.router.use('/users', userRoute.router);
+        
+        // The protected routes
+        this.router.use('/admin', authenticate, adminRoute.router);
     }
 }
 
