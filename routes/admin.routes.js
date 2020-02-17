@@ -1,5 +1,5 @@
 const express = require('express');
-const { User } = require('../db/models/user.model');
+const { Cv, User } = require('../db/models/index.models');
 
 class AdminRoutes {
     constructor(db) {
@@ -54,6 +54,15 @@ class AdminRoutes {
         });
         
         // Protedted CV routes
+        this.router.get('/cv/all', (req, res) => {
+            Cv.find({}).then((cvs) => {
+                console.log(`[GET] SUCCESS /cv/all`);
+                res.status(200).send(cvs);
+            }).catch((e) => {
+                console.log(`[GET] /cv/all error: ${e.message}`);
+                res.send(e);
+            });
+        });
 
         this.router.post('/cv', (req, res) => {
             let reqCv = req.body.cv;
