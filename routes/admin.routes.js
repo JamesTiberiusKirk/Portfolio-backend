@@ -21,6 +21,15 @@ class AdminRoutes {
             let username = req.body.username;
             let password = req.body.password;
 
+            console.log(req.body);
+            if(!username){
+                return res.status(400).send('Please supply a username');
+            }
+            if(!password){
+                return res.status(400).send('Please supply a password');
+            }
+
+
             let newUser = new User({
                 username,
                 password
@@ -37,10 +46,10 @@ class AdminRoutes {
                     .header('x-refresh-token', authToken.refreshToken)
                     .header('x-access-token', authToken.accessToken)
                     .send(newUser);
-                console.log('[POST] SUCCESS /users');
+                // console.log('[POST] SUCCESS /admin/users/add');
             }).catch((e) => {
                 res.status(400).send(e.message);
-                console.log(`[POST] /users error: ${e}`);
+                // console.log(`[POST] /admin/users/add error: ${e}`);
             });
         });
         
@@ -51,7 +60,7 @@ class AdminRoutes {
             let newCv = new Cv(reqCv);
 
             newCv.save().then((cvDoc) => {
-                console.log(`[POST] SUCCESS /cv`);
+                // console.log(`[POST] SUCCESS /cv`);
                 res.sendStatus(200);
             }).catch((e) => {
                 console.log(`[POST] /cv error: ${e.message}`);
@@ -64,7 +73,7 @@ class AdminRoutes {
                 $set: req.body.cv
             }).then(() => {
                 res.sendStatus(200);
-                console.log('[PATCH] SUCCESS /update');
+                // console.log('[PATCH] SUCCESS /update');
             }).catch((e) => {
                 res.send(e.message);
                 console.log(`[PATCH] /update error: ${e.message}`);
@@ -76,7 +85,7 @@ class AdminRoutes {
                 _id: req.body._id
             }).then(() => {
                 res.sendStatus(200);
-                console.log('[DELETE] SUCCESS /delete');
+                // console.log('[DELETE] SUCCESS /delete');
             }).catch((e) => {
                 res.send(e.message);
                 console.log(`[DELETE] /delete error: ${e.message}`);

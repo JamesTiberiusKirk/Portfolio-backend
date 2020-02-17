@@ -21,7 +21,7 @@ class CvRoute {
         this.router.get('/', (req, res, next) => {
             Cv.find({})
                 .then((cv) => {
-                    console.log('[GET] /cv');
+                    // console.log('[GET] /cv');
                     res.send(cv);
                 })
                 .catch((e) => {
@@ -34,7 +34,7 @@ class CvRoute {
             Cv.find({
                 _id: req.params.cvId
             }).then((cv) => {
-                console.log(`[GET] /${req.params.cvId}`);
+                // console.log(`[GET] /${req.params.cvId}`);
                 res.send(cv);
             })
                 .catch((e) => {

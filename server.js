@@ -2,6 +2,7 @@ const express  = require('express');
 
 const IndexRoutes = require('./routes/index.routes');
 const appConfig = require('./config/config').app;
+const morgan =  require('morgan');
 
 const app = express();
 
@@ -22,6 +23,7 @@ class Server {
 
     initRoutes() {
         let indexRoutes = new IndexRoutes(this.db);
+        app.use(morgan('combined'));
         app.use('/',indexRoutes.router);
     }
 }
