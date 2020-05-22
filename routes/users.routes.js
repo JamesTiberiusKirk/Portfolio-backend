@@ -32,12 +32,10 @@ class UserRoute {
 
             login(username, password)
                 .then((response) => {
-                    // console.log(`[POST] SUCCESS /login user:${response.user.username} logged in`);
                     res.header('x-refresh-token', response.authToken.refreshtoken)
                         .header('x-access-token', response.authToken.accessToken)
                         .status(200).send(response.user);
                 }).catch((err) => {
-                    console.log(err)
                     res.status(401).send(err);
                 });
 
