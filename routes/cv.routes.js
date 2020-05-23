@@ -21,7 +21,7 @@ class CvRoute {
         this.router.get('/', (req, res, next) => {
             Cv.find({})
                 .then((cv) => {
-                    res.send(cv);
+                    res.send(cv[0]);
                 })
                 .catch((e) => {
                     console.log(`[GET] /cv error: ${e.message}`);
