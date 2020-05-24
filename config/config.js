@@ -6,7 +6,8 @@ const config = {
     },
     db: {
         creds: secret,
-        host: 'localhost',
+        // host: 'localhost',
+        host: 'portfolio-db',
         port: 27017,
         dbName: 'portfolio'
     },
