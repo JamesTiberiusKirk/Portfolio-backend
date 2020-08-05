@@ -1,10 +1,14 @@
 const mongoose = require('mongoose');
-const dbConf = require('../config/config').db;
 
 class Db {
 
-    constructor() {
-        this.uri = `mongodb://${dbConf.creds}@${dbConf.host}:${dbConf.port}/${dbConf.dbName}`;
+    dbConf;
+    uri;
+    dbOpts;
+
+    constructor(dbConf) {
+        this.dbConf = dbConf;
+        this.uri = `mongodb://${this.dbConf.creds}@${this.dbConf.host}:${this.dbConf.port}/${this.dbConf.dbName}`;
         this.dbOpts = {
             useUnifiedTopology: true,
             useNewUrlParser: true

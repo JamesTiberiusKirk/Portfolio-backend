@@ -1,13 +1,15 @@
-const secret = require('./dbSecret');
+function getCreds(){
+    return process.env.CREDS;
+}
 
 const config = {
     app: {
         port: 3000
     },
     db: {
-        creds: secret,
-        // host: 'localhost',
-        host: 'portfolio-db',
+        creds: getCreds(),
+        host: 'localhost',
+        // host: 'portfolio-db',
         port: 27017,
         dbName: 'portfolio'
     },
