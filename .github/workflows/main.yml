@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Docker Build
+      run: docker build --tag dumitruvulpe/portfolio-backend:latest
+
+    # Runs a set of commands using the runners shell
+    - name: Docker Login
+      env: 
+        DOCKER_USER: ${{secrets.DOCKER_USER}} 
+        DOCKER_PASS: ${{secrets.DOCKER_PASS}} 
+      run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+    
+    - name: Docker Push
+      run: docker push dumitruvulpe/portfolio-backend:latest
