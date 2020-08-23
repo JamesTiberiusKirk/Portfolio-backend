@@ -1,4 +1,5 @@
 const express = require('express');
+const hash = require('../lib/hash');
 const { Cv, User } = require('../db/models/index.models');
 
 class AdminRoutes {
@@ -17,15 +18,33 @@ class AdminRoutes {
     }
 
     initRoutes() {
+        this.router.patch('/users/change_pass', (req, res) => {
+            let id = req.user_id;
+            let newPassword = req.body.new_password;
+
+            if (!newPassword) {
+                return res.status(400).send('Please supply a new password');
+            }
+
+            if (!id) {
+                return res.status(400).send('Please supply the user id');
+            }
+
+            hash(newPassword).then((hash) => {
+                User.findByIdAndUpdate({ _id: id }, { password: hash }).then(() => {
+                    res.send('Updated');
+                });
+            });
+        });
+
         this.router.post('/users/add', (req, res) => {
             let username = req.body.username;
             let password = req.body.password;
 
-            console.log(req.body);
-            if(!username){
+            if (!username) {
                 return res.status(400).send('Please supply a username');
             }
-            if(!password){
+            if (!password) {
                 return res.status(400).send('Please supply a password');
             }
 
@@ -50,7 +69,7 @@ class AdminRoutes {
                 res.status(400).send(e.message);
             });
         });
-        
+
         // Protected CV routes
         this.router.get('/cv/all', (req, res) => {
             Cv.find({}).then((cvs) => {
@@ -73,9 +92,9 @@ class AdminRoutes {
 
         this.router.patch('/cv/update', (req, res) => {
             Cv.findOneAndUpdate({ _id: req.body.cv._id }, {
-                $set: { markdown:req.body.cv.markdown }
-            }, {new: true}, (err, doc) => {
-                if(err){
+                $set: { markdown: req.body.cv.markdown }
+            }, { new: true }, (err, doc) => {
+                if (err) {
                     res.send(e.message);
                     return;
                 }
