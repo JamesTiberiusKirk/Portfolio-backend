@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwtConfig = require('../../config/config').jwt;
+const hash = require('../../lib/hash');
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -32,14 +33,11 @@ const UserSchema = new mongoose.Schema({
 
 UserSchema.pre('save', function (next) {
     let user = this;
-    let constFactor = 10;
 
     if (user.isModified('password')) {
-        bcrypt.genSalt(constFactor, (err, salt) => {
-            bcrypt.hash(user.password, salt, (err, hash) => {
-                user.password = hash;
-                next();
-            });
+        hash(password).then(hash=>{
+            user.password = hash;
+            next();
         });
     } else {
         next();
@@ -143,9 +141,9 @@ let saveSessionToDatabase = (user, refreshToken) => {
 }
 
 let generateRefreshTokenExpiryTime = () => {
-    let daysUntilExpire = jwtConfig.refreshTokenExpiery;
-    let secondsUntilExpie = ((daysUntilExpire * 24) * 60) * 60;
-    return ((Date.now() / 1000) + secondsUntilExpie);
+    let daysUntilExpire = jwtConfig.refreshTokenExpiry;
+    let secondsUntilExpire = ((daysUntilExpire * 24) * 60) * 60;
+    return ((Date.now() / 1000) + secondsUntilExpire);
 }
 
 const User = mongoose.model('Users', UserSchema);
