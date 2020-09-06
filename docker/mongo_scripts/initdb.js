@@ -4,6 +4,6 @@ db.createCollection('users');
 
 db.users.insertOne({
     username: 'darthvader',
-    password: '$2a$10$oTOcg0q1QLYgTJcw0Slss.A/esxPCk7cr1tnsb/B.BCRPN33q0mIq',
+    password: '$2a$10$BdtaxR5G2YZ7T5gfOvqi3.q5FkbQNTn2GxyasxEmXyAMnCEs.86Qu',
     sessions: []
 });
