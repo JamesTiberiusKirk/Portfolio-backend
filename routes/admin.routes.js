@@ -18,23 +18,34 @@ class AdminRoutes {
     }
 
     initRoutes() {
-        this.router.patch('/users/change_pass', (req, res) => {
+        this.router.patch('/users/update', async (req, res) => {
             let id = req.user_id;
-            let newPassword = req.body.new_password;
+            let update = req.update;
 
-            if (!newPassword) {
-                return res.status(400).send('Please supply a new password');
-            }
+            console.log('update');
 
             if (!id) {
                 return res.status(400).send('Please supply the user id');
             }
 
-            hash(newPassword).then((hash) => {
-                User.findByIdAndUpdate({ _id: id }, { password: hash }).then(() => {
-                    res.send('Updated');
-                });
+            if (!update) {
+                return res.status(400).send('Nothing to update');
+            }
+
+            let hash;
+
+            if (update.password){
+                hash = await hash(update.password); 
+                update.password = hash;
+            }
+
+            User.findByIdAndUpdate({ _id: id }, update).then(() => {
+                res.status(201).send('Updated');
+            }).catch((err)=>{
+                console.error(err);
+                return res.sendStatus(500);
             });
+
         });
 
         this.router.post('/users/add', (req, res) => {
